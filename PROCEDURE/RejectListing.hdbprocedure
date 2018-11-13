@@ -1,0 +1,31 @@
+PROCEDURE "BIDCHAIN"."BIDDINGCHAIN.PROCEDURE::RejectListing" (
+    
+    IN lv_list_id NVARCHAR(20),
+    OUT ex_error "BIDDINGCHAIN.DBARTIFACT::TableAndStructure.tt_exception"
+)
+   LANGUAGE SQLSCRIPT
+   SQL SECURITY INVOKER AS
+   --DEFAULT SCHEMA <default_schema_name>
+--   READS SQL DATA AS
+BEGIN
+ DECLARE lv_projid NVARCHAR(20);
+   DECLARE lv_status Nvarchar(10);
+   
+   select "projid","listing_status" into lv_projid, lv_status  from  "_SYS_BIC"."BIDDINGCHAIN.Project/ListingMaster" where "listid" = :lv_list_id;
+   
+IF (lv_status = 'Pending')
+
+Then 
+update "BIDCHAIN"."BIDDINGCHAIN.DBARTIFACT::TableAndStructure.Listing" set "listing_status" = 'Rejected' , "last_updated_on" = CURRENT_TIMESTAMP
+where "listid"  = :lv_list_id;
+
+update "BIDCHAIN"."BIDDINGCHAIN.DBARTIFACT::TableAndStructure.Projects" set "listing_status" = 'Rejected' , "last_updated_on" = CURRENT_TIMESTAMP
+where "projectid"  = :lv_projid;
+
+ELSE
+ex_error = select 500 as http_status_code, 
+              'Already Approved or Status Cannot be Changed'  as error_message, 
+                     'Status cannot be changed ' as detail from dummy;
+END IF;
+
+END

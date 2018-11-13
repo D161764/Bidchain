@@ -1,0 +1,48 @@
+PROCEDURE "BIDCHAIN"."BIDDINGCHAIN.PROCEDURE::ListCreate"(
+		IN intab "BIDCHAIN"."BIDDINGCHAIN.DBARTIFACT::TableAndStructure.tt_ProjectListing", 
+		OUT ex_error "BIDCHAIN"."BIDDINGCHAIN.DBARTIFACT::TableAndStructure.tt_exception"
+	)
+	LANGUAGE SQLSCRIPT
+	SQL SECURITY INVOKER
+AS
+BEGIN
+	DECLARE lv_listid NVARCHAR(20);
+	DECLARE lv_projid NVARCHAR(20);
+	DECLARE lv_ownerid NVARCHAR(20);
+	DECLARE lv_list_sts NVARCHAR(10);
+	DECLARE lv_bidamt INT;
+	DECLARE lv_counter INT;
+
+	SELECT "listid", 
+			"projid", 
+			"projowner", 
+			"max_bid_amt"
+		INTO lv_listid, 
+			lv_projid, 
+			lv_ownerid, 
+			lv_bidamt
+		FROM :intab;
+	SELECT count(*)
+		INTO lv_counter
+		FROM "BIDCHAIN"."BIDDINGCHAIN.DBARTIFACT::TableAndStructure.Listing"
+		WHERE "listid" = UPPER(lv_listid);
+	IF (lv_counter > 0) THEN
+		ex_error = SELECT 500 AS http_status_code, 
+					'Listing ID Already exist ' || lv_listid AS error_message, 
+					'Listing ID is Already Registered ' || lv_listid AS detail
+				FROM dummy;
+	ELSEIF (lv_listid IS NULL
+OR lv_bidamt IS NULL) THEN
+			ex_error = SELECT 500 AS http_status_code, 
+						'Please fill up the all fields' || lv_listid AS error_message, 
+						'emplty value will be not accepted' AS detail
+					FROM dummy;
+		ELSE
+			INSERT INTO "BIDCHAIN"."BIDDINGCHAIN.DBARTIFACT::TableAndStructure.Listing"("listid", "projid", "projowner", "listing_status", "max_bid_amt", "created_on", "last_updated_on") VALUES(UPPER(lv_listid), lv_projid, lv_ownerid, 'Pending', lv_bidamt, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+			UPDATE "BIDCHAIN"."BIDDINGCHAIN.DBARTIFACT::TableAndStructure.Projects"
+SET "listing_status" = 'Pending', 
+				"last_updated_on" = CURRENT_TIMESTAMP
+WHERE "projectid" = lv_projid;
+		END IF;
+
+END

@@ -1,0 +1,66 @@
+PROCEDURE "BIDCHAIN"."BIDDINGCHAIN.PROCEDURE::ProjectRegistration" (
+    IN intab "BIDCHAIN"."BIDDINGCHAIN.DBARTIFACT::TableAndStructure.tt_ProjectRegistration",
+    OUT ex_error "BIDCHAIN"."BIDDINGCHAIN.DBARTIFACT::TableAndStructure.tt_exception")
+   LANGUAGE SQLSCRIPT
+   SQL SECURITY INVOKER AS
+   --DEFAULT SCHEMA <default_schema_name>
+--   READS SQL DATA AS
+BEGIN
+  DECLARE lv_projectid NVARCHAR(20);
+  DECLARE lv_project_owner_id NVARCHAR(20);
+  DECLARE lv_project_owner_mail NVARCHAR(60);
+  DECLARE lv_project_details NCLOB;
+  DECLARE lv_project_name NVARCHAR(20);
+  DECLARE lv_counter INT;
+   
+   select 
+   	"projectid",
+	"project_owner_id",
+	"project_details",
+	"project_name",
+	"project_owner_mail"
+	into 
+ 	lv_projectid,
+	lv_project_owner_id,
+	lv_project_details,
+	lv_project_name,
+	lv_project_owner_mail from :intab;
+	
+	select count(*) into lv_counter from "BIDCHAIN"."BIDDINGCHAIN.DBARTIFACT::TableAndStructure.Projects"
+	WHERE "projectid" = UPPER(lv_projectid);
+	
+	IF(lv_counter > 0) THEN 
+		ex_error = SELECT 500 AS http_status_code, 
+					'Project Already exist ' || UPPER(lv_projectid) AS error_message, 
+					'Project is already exist '|| UPPER(lv_projectid) AS detail
+				FROM dummy;
+	    ELSEIF (lv_projectid is NULL
+OR lv_project_owner_id is NULL
+OR lv_project_details is NULL
+OR lv_project_name is NULL
+OR lv_project_owner_mail is NULL) THEN
+	ex_error = SELECT 500 AS http_status_code, 
+					'Please fill up the all fields ' || UPPER(lv_projectid) AS error_message, 
+					'emplty value will be not accepted' AS detail
+				FROM dummy;
+ELSE 
+    INSERT INTO "BIDCHAIN"."BIDDINGCHAIN.DBARTIFACT::TableAndStructure.Projects" ("projectid",
+	"project_owner_id",
+	"project_details",
+	"project_name",
+	"project_executioner",
+	"project_status",
+	"approver_id",
+	"approver_email",
+	"created_on",
+	"last_updated_on",
+	"listing_status",
+	"project_owner_mail") values (UPPER(lv_projectid),lv_project_owner_id,lv_project_details,lv_project_name,lv_project_owner_id,'Pending','Governor',
+	                   'NYR',CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,
+	                   'NYR',lv_project_owner_mail);
+
+	END IF;
+	
+	
+   
+END

@@ -1,0 +1,43 @@
+PROCEDURE "BIDCHAIN"."BIDDINGCHAIN.PROCEDURE::ApprovedListing" (
+    IN lv_list_id NVARCHAR(20),
+    OUT ex_error "BIDDINGCHAIN.DBARTIFACT::TableAndStructure.tt_exception"
+    )
+   LANGUAGE SQLSCRIPT
+   SQL SECURITY INVOKER AS
+   --DEFAULT SCHEMA <default_schema_name>
+--   READS SQL DATA AS
+BEGIN
+   /*************************************
+       Write your procedure logic 
+   *************************************/
+   DECLARE lv_projid NVARCHAR(20);
+   DECLARE lv_status Nvarchar(10);
+   DECLARE lv_maxamt INT;
+   DECLARE lv_balance INT;
+   DECLARE net_bal INT;
+   DECLARE lv_owner NVARCHAR(20);
+   
+   select "projid","listing_status","max_bid_amt" into lv_projid, lv_status ,lv_maxamt  from  "_SYS_BIC"."BIDDINGCHAIN.Project/ListingMaster" where "listid" = :lv_list_id;
+   
+   select "balances","project_owner_id" into lv_balance, lv_owner from "_SYS_BIC"."BIDDINGCHAIN.Project/ProjMaster" where "projectid" = lv_projid;
+   
+   net_bal:= lv_balance - lv_maxamt;
+IF (lv_status = 'Pending')
+
+Then 
+update "BIDCHAIN"."BIDDINGCHAIN.DBARTIFACT::TableAndStructure.Listing" set "listing_status" = 'Approved' , "last_updated_on" = CURRENT_TIMESTAMP
+where "listid"  = :lv_list_id;
+
+update "BIDCHAIN"."BIDDINGCHAIN.DBARTIFACT::TableAndStructure.Projects" set "listing_status" = 'Approved' , "last_updated_on" = CURRENT_TIMESTAMP
+where "projectid"  = :lv_projid;
+
+update "BIDCHAIN"."BIDDINGCHAIN.DBARTIFACT::TableAndStructure.UserProfile" set "balances" = net_bal where "userid" = lv_owner;
+
+ELSE
+ex_error = select 500 as http_status_code, 
+              'Already Approved or Status Cannot be Changed'  as error_message, 
+                     'Status cannot be changed ' as detail from dummy;
+END IF;
+
+   
+END

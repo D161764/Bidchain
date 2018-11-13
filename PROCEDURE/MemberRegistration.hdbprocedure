@@ -1,0 +1,130 @@
+PROCEDURE "BIDCHAIN"."BIDDINGCHAIN.PROCEDURE::MemberRegistration" ( 
+    IN intab "BIDCHAIN"."BIDDINGCHAIN.DBARTIFACT::TableAndStructure.tt_MemberRegistration",
+    OUT ex_error "BIDCHAIN"."BIDDINGCHAIN.DBARTIFACT::TableAndStructure.tt_exception"
+)
+   LANGUAGE SQLSCRIPT
+   SQL SECURITY INVOKER AS
+   --DEFAULT SCHEMA <default_schema_name>
+--   READS SQL DATA AS
+BEGIN
+   /*************************************
+       Write your procedure logic 
+   *************************************/
+   DECLARE lv_userid NVARCHAR(20);
+   DECLARE lv_email NVARCHAR(60);
+   DECLARE lv_firstname NVARCHAR(100);
+   DECLARE lv_lastname NVARCHAR(100);
+   DECLARE lv_displayname NVARCHAR(100);
+   DECLARE lv_custrating NVARCHAR(20);
+   DECLARE lv_cmmi INT;
+   DECLARE lv_empsize INT;
+   DECLARE lv_orgname NVARCHAR(100);
+   DECLARE lv_aboutorg NCLOB;
+   DECLARE lv_contact NVARCHAR(20);
+   DECLARE lv_status NVARCHAR(10);
+   DECLARE lv_strno NVARCHAR(20);
+   DECLARE lv_street NVARCHAR(500);
+   DECLARE lv_city NVARCHAR(50);
+   DECLARE lv_state NVARCHAR(20);
+   DECLARE lv_zip NVARCHAR(20);
+   DECLARE lv_balance INT;
+   DECLARE lv_counter INT;
+   
+   select 
+   "userid",
+	"email",
+	"firstname",
+	"lastname",
+	"displayname",
+	"customerrating",
+	"cmmilevel",
+	"employee_size",
+	"aboutorg",
+	"contact",
+	"status",
+	"street_no",
+	"street",
+	"city",
+	"state",
+	"postal_code",
+	"orgname",
+	"balances"
+	into 
+	lv_userid,
+	lv_email,
+	lv_firstname,
+	lv_lastname,
+	lv_displayname,
+	lv_custrating,
+	lv_cmmi,
+	lv_empsize,
+	lv_aboutorg,
+	lv_contact,
+	lv_status,
+	lv_strno,
+	lv_street,
+	lv_city,
+	lv_state,
+	lv_zip,
+	lv_orgname,
+	lv_balance from :intab;
+	
+	select count(*) into lv_counter from "BIDCHAIN"."BIDDINGCHAIN.DBARTIFACT::TableAndStructure.UserProfile"
+	WHERE "userid" = lv_userid;
+	
+	IF(lv_counter > 0) THEN 
+		ex_error = SELECT 500 AS http_status_code, 
+					'User ID Already exist ' || lv_userid AS error_message, 
+					'You are already Registered from '|| lv_userid AS detail
+				FROM dummy;
+	    ELSEIF (lv_userid is NULL
+OR lv_email is NULL
+OR lv_firstname is NULL
+OR lv_lastname is NULL
+OR lv_displayname is NULL
+OR lv_custrating is NULL
+OR lv_cmmi is NULL
+OR lv_empsize is NULL
+OR lv_aboutorg is NULL
+OR lv_contact is NULL
+OR lv_status is NULL
+OR lv_strno is NULL
+OR lv_street is NULL
+OR lv_city is NULL
+OR lv_state is NULL
+OR lv_zip is NULL
+OR lv_orgname is NULL
+OR lv_balance is NULL) THEN
+	ex_error = SELECT 500 AS http_status_code, 
+					'Please fill up the all fields' || lv_userid AS error_message, 
+					'emplty value will be not accepted' AS detail
+				FROM dummy;
+ELSE 
+    INSERT INTO "BIDCHAIN"."BIDDINGCHAIN.DBARTIFACT::TableAndStructure.UserProfile"("userid",
+	"email",
+	"firstname",
+	"lastname",
+	"displayname",
+	"customerrating",
+	"cmmilevel",
+	"employee_size",
+	"aboutorg",
+	"registration_time",
+	"contact",
+	"status",
+	"last_updated_on",
+	"street_no",
+	"street",
+	"city",
+	"state",
+	"postal_code",
+	"orgname",
+    "balances") values (lv_userid,lv_email,lv_firstname,lv_lastname,lv_displayname,lv_custrating,lv_cmmi,
+	                   lv_empsize,lv_aboutorg,CURRENT_TIMESTAMP,lv_contact,lv_status,CURRENT_TIMESTAMP,
+	                   lv_strno,lv_street,lv_city,lv_state,lv_zip,lv_orgname,lv_balance);
+
+	END IF;
+	
+	
+   
+END

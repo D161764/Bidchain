@@ -1,0 +1,17 @@
+service {
+
+
+"_SYS_BIC"."BIDDINGCHAIN.Approval/UserApproval" as "UserProfile" keys ("userid") 
+
+create using "BIDDINGCHAIN.PROCEDURE::MemberRegistration";   
+
+"_SYS_BIC"."BIDDINGCHAIN.Approval/ApprovedUser" as "UserAccount" keys ("userid") ;
+
+"_SYS_BIC"."BIDDINGCHAIN.Project/ProjMaster" as "ProjectMaster" keys("projectid")
+
+create using "BIDDINGCHAIN.PROCEDURE::ProjectRegistration";  
+
+"_SYS_BIC"."BIDDINGCHAIN.Project/ListingMaster" as "ProjectListing" keys("listid")
+
+create using "BIDDINGCHAIN.PROCEDURE::ListCreate";
+}    

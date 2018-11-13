@@ -1,0 +1,102 @@
+namespace BIDDINGCHAIN.DBARTIFACT;
+@Schema: 'BIDCHAIN' 
+context TableAndStructure {
+   @Catalog.tableType: #COLUMN
+   Entity UserProfile{
+       key userid: String(20);
+           email : String(60);
+           firstname: String(100);
+           lastname: String(100);
+           displayname: String(100);
+           customerrating: String(20);
+           cmmilevel: Integer;
+           employee_size: Integer;
+           orgname: String(100);
+           aboutorg: LargeString;
+           registration_time: UTCTimestamp;
+           contact: String(20);
+           status: String(10);
+           last_updated_on: UTCTimestamp;
+           street_no: String(20);
+           street : String(500);
+           city : String(50);
+           state: String(20);
+           postal_code: String(20);
+           balances: Integer;
+   };
+   @Catalog.tableType: #COLUMN
+   Entity Projects{
+          key projectid : String(20);
+              project_owner_id: String(20);
+              project_owner_mail:String(60);
+              project_details: LargeString;
+              project_name: String(20);
+              project_executioner: String(20);
+              project_status: String(10);
+              approver_id: String(20);
+              approver_email: String(60);
+              created_on: UTCTimestamp;
+              last_updated_on : UTCTimestamp;
+              listing_status : String(15);
+   };
+   
+   @Catalog.tableType: #COLUMN
+   
+   Entity Listing{
+          key listid : String(20);
+              projid : String(20);
+              projowner: String(20);
+              listing_status : String(10);
+              max_bid_amt : Integer;
+              created_on: UTCTimestamp;
+              last_updated_on : UTCTimestamp;
+              
+   };
+   
+   Type tt_ProjectListing {
+              listid : String(20);
+              projid : String(20);
+              projowner: String(20);
+              max_bid_amt : Integer;
+              
+   };
+   
+   Type tt_ProjectRegistration {
+              projectid : String(20);
+              project_owner_id: String(20);
+              project_owner_mail:String(60);
+              project_details: LargeString;
+              project_name: String(20);
+
+   };
+   
+   
+   Type tt_MemberRegistration{
+          userid: String(20);
+           email : String(60);
+           firstname: String(100);
+           lastname: String(100);
+           displayname: String(100);
+           customerrating: String(20);
+           cmmilevel: Integer;
+           employee_size: Integer;
+           orgname: String(100);
+           aboutorg: LargeString;
+           contact: String(20);
+           status: String(10);
+           street_no: String(20);
+           street : String(500);
+           city : String(50);
+           state: String(20);
+           postal_code: String(20);
+           balances: Integer;
+   
+   };
+   
+   Type tt_exception {
+        HTTP_STATUS_CODE : Integer;
+        ERROR_MESSAGE : String(100);
+        DETAIL : String(100);
+      };
+   
+};

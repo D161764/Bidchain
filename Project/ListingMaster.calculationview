@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Calculation:scenario xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:Calculation="http://www.sap.com/ndb/BiModelCalculation.ecore" id="ListingMaster" applyPrivilegeType="NONE" dataCategory="DIMENSION" dimensionType="STANDARD" schemaVersion="2.3" defaultClient="crossClient" visibility="internal" calculationScenarioType="SCRIPT_BASED" scriptParametersCaseSensitive="true" enforceSqlExecution="false">
+<descriptions defaultDescription="ListingMaster"/>
+<localVariables/>
+<variableMappings/>
+<dataSources/>
+<calculationViews>
+  <calculationView xsi:type="Calculation:SqlScriptView" id="Script_View">
+    <viewAttributes>
+      <viewAttribute id="listid" datatype="NVARCHAR" length="20"/>
+      <viewAttribute id="projid" datatype="NVARCHAR" length="20"/>
+      <viewAttribute id="projowner" datatype="NVARCHAR" length="20"/>
+      <viewAttribute id="listing_status" datatype="NVARCHAR" length="10"/>
+      <viewAttribute id="max_bid_amt" datatype="INTEGER"/>
+      <viewAttribute id="created_on" datatype="TIMESTAMP"/>
+      <viewAttribute id="last_updated_on" datatype="TIMESTAMP"/>
+      <viewAttribute id="balances" datatype="INTEGER"/>
+    </viewAttributes>
+    <calculatedViewAttributes/>
+    <definition>/********* Begin Procedure Script ************/ 
+BEGIN 
+
+   VAR_T1 = SELECT 	&quot;listid&quot;,
+	&quot;projid&quot;,
+	&quot;projowner&quot;,
+	&quot;listing_status&quot;,
+	&quot;max_bid_amt&quot;,
+	&quot;created_on&quot;,
+	&quot;last_updated_on&quot;
+FROM &quot;BIDCHAIN&quot;.&quot;BIDDINGCHAIN.DBARTIFACT::TableAndStructure.Listing&quot;;
+
+   
+   VAR_T2 = SELECT 
+	&quot;userid&quot;,
+	&quot;balances&quot;
+FROM &quot;BIDCHAIN&quot;.&quot;BIDDINGCHAIN.DBARTIFACT::TableAndStructure.UserProfile&quot; where &quot;status&quot; = 'Approved';
+
+   T3 = SELECT 	T1.&quot;listid&quot;,
+   T1.&quot;projid&quot;,
+	T1.&quot;projowner&quot;,
+	T1.&quot;listing_status&quot;,
+	T1.&quot;max_bid_amt&quot;,
+	T1.&quot;created_on&quot;,
+	T1.&quot;last_updated_on&quot;,
+	T2.&quot;userid&quot;,
+	T2.&quot;balances&quot;  from :VAR_T1 as T1 inner join :VAR_T2 as T2 on 
+	T1.&quot;projowner&quot; = T2.&quot;userid&quot;;
+	
+	
+   var_out = SELECT &quot;listid&quot;,
+	&quot;projid&quot;,
+	&quot;projowner&quot;,
+	&quot;listing_status&quot;,
+	&quot;max_bid_amt&quot;,
+	&quot;created_on&quot;,
+	&quot;last_updated_on&quot;,
+	&quot;balances&quot; from :T3;
+
+END /********* End Procedure Script ************/</definition>
+  </calculationView>
+</calculationViews>
+<logicalModel id="Script_View">
+  <attributes>
+    <attribute id="listid" key="true" order="1">
+      <descriptions defaultDescription="listid"/>
+      <keyMapping columnObjectName="Script_View" columnName="listid"/>
+    </attribute>
+    <attribute id="projid" order="2">
+      <descriptions defaultDescription="projid"/>
+      <keyMapping columnObjectName="Script_View" columnName="projid"/>
+    </attribute>
+    <attribute id="projowner" order="3">
+      <descriptions defaultDescription="projowner"/>
+      <keyMapping columnObjectName="Script_View" columnName="projowner"/>
+    </attribute>
+    <attribute id="listing_status" order="4">
+      <descriptions defaultDescription="listing_status"/>
+      <keyMapping columnObjectName="Script_View" columnName="listing_status"/>
+    </attribute>
+    <attribute id="max_bid_amt" order="5">
+      <descriptions defaultDescription="max_bid_amt"/>
+      <keyMapping columnObjectName="Script_View" columnName="max_bid_amt"/>
+    </attribute>
+    <attribute id="created_on" order="6">
+      <descriptions defaultDescription="created_on"/>
+      <keyMapping columnObjectName="Script_View" columnName="created_on"/>
+    </attribute>
+    <attribute id="last_updated_on" order="7">
+      <descriptions defaultDescription="last_updated_on"/>
+      <keyMapping columnObjectName="Script_View" columnName="last_updated_on"/>
+    </attribute>
+    <attribute id="balances" order="8">
+      <keyMapping columnObjectName="Script_View" columnName="balances"/>
+    </attribute>
+  </attributes>
+  <calculatedAttributes/>
+  <baseMeasures/>
+  <calculatedMeasures/>
+  <restrictedMeasures/>
+</logicalModel>
+<layout>
+  <shapes>
+    <shape expanded="true" modelObjectName="Output" modelObjectNameSpace="MeasureGroup">
+      <upperLeftCorner x="40" y="85"/>
+    </shape>
+  </shapes>
+</layout>
+</Calculation:scenario>

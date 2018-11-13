@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Calculation:scenario xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:Calculation="http://www.sap.com/ndb/BiModelCalculation.ecore" id="UserApproval" applyPrivilegeType="NONE" dataCategory="DIMENSION" dimensionType="STANDARD" schemaVersion="2.3" defaultClient="crossClient" visibility="internal" calculationScenarioType="SCRIPT_BASED" scriptParametersCaseSensitive="true" enforceSqlExecution="false">
+<descriptions defaultDescription="UserApproval"/>
+<localVariables/>
+<variableMappings/>
+<dataSources/>
+<calculationViews>
+  <calculationView xsi:type="Calculation:SqlScriptView" id="Script_View">
+    <viewAttributes>
+      <viewAttribute id="userid" datatype="NVARCHAR" length="20"/>
+      <viewAttribute id="email" datatype="NVARCHAR" length="60"/>
+      <viewAttribute id="firstname" datatype="NVARCHAR" length="100"/>
+      <viewAttribute id="lastname" datatype="NVARCHAR" length="100"/>
+      <viewAttribute id="displayname" datatype="NVARCHAR" length="100"/>
+      <viewAttribute id="customerrating" datatype="INTEGER"/>
+      <viewAttribute id="cmmilevel" datatype="INTEGER"/>
+      <viewAttribute id="employee_size" datatype="INTEGER"/>
+      <viewAttribute id="aboutorg" datatype="NCLOB"/>
+      <viewAttribute id="registration_time" datatype="TIMESTAMP"/>
+      <viewAttribute id="contact" datatype="NVARCHAR" length="20"/>
+      <viewAttribute id="status" datatype="NVARCHAR" length="10"/>
+      <viewAttribute id="last_updated_on" datatype="TIMESTAMP"/>
+      <viewAttribute id="street_no" datatype="NVARCHAR" length="20"/>
+      <viewAttribute id="street" datatype="NVARCHAR" length="500"/>
+      <viewAttribute id="city" datatype="NVARCHAR" length="50"/>
+      <viewAttribute id="state" datatype="NVARCHAR" length="20"/>
+      <viewAttribute id="postal_code" datatype="NVARCHAR" length="20"/>
+      <viewAttribute id="orgname" datatype="NVARCHAR" length="100"/>
+      <viewAttribute id="balances" datatype="INTEGER"/>
+      <viewAttribute id="barcodeurl" datatype="NVARCHAR" length="500"/>
+    
+      <viewAttribute id="lvgcavatar" datatype="NVARCHAR" length="500"/>
+    
+      <viewAttribute id="success_rate" datatype="INTEGER"/>
+    </viewAttributes>
+    <calculatedViewAttributes/>
+    <definition>/********* Begin Procedure Script ************/ 
+BEGIN 
+   declare lv_gcapi NVARCHAR(500);
+   declare lv_gcavatar NVARCHAR(500);
+   lv_gcapi = 'https://chart.googleapis.com/chart?cht=qr&amp;chs=329x329&amp;chl=';
+   lv_gcavatar = 'https://ui-avatars.com/api/?background=0D8ABC&amp;color=fff&amp;rounded=true&amp;size=80&amp;name=';
+    T1 = SELECT 
+	&quot;userid&quot;,
+	&quot;email&quot;,
+	&quot;firstname&quot;,
+	&quot;lastname&quot;,
+	&quot;displayname&quot;,
+	&quot;customerrating&quot;,
+	&quot;cmmilevel&quot;,
+	&quot;employee_size&quot;,
+	&quot;aboutorg&quot;,
+	&quot;registration_time&quot;,
+	&quot;contact&quot;,
+	&quot;status&quot;,
+	&quot;last_updated_on&quot;,
+	&quot;street_no&quot;,
+	&quot;street&quot;,
+	&quot;city&quot;,
+	&quot;state&quot;,
+	&quot;postal_code&quot;,
+	&quot;orgname&quot;,
+	&quot;balances&quot;,
+	CONCAT(CAST(:lv_gcapi as Varchar),CAST(&quot;userid&quot; as Varchar)) as &quot;barcodeurl&quot;,
+	CONCAT(CAST(:lv_gcavatar as Varchar),CAST(&quot;firstname&quot; as Varchar)) as &quot;lvgca1&quot;,
+	CONCAT(CAST('+' as Varchar),CAST(&quot;lastname&quot; as Varchar)) as &quot;lvgca2&quot;
+
+FROM &quot;BIDCHAIN&quot;.&quot;BIDDINGCHAIN.DBARTIFACT::TableAndStructure.UserProfile&quot;;
+
+T2 = SELECT 
+	&quot;userid&quot;,
+	&quot;email&quot;,
+	&quot;firstname&quot;,
+	&quot;lastname&quot;,
+	&quot;displayname&quot;,
+	CAST(&quot;customerrating&quot; as Integer) as &quot;customerrating&quot; ,
+	&quot;cmmilevel&quot;,
+	&quot;employee_size&quot;,
+	&quot;aboutorg&quot;,
+	&quot;registration_time&quot;,
+	&quot;contact&quot;,
+	&quot;status&quot;,
+	&quot;last_updated_on&quot;,
+	&quot;street_no&quot;,
+	&quot;street&quot;,
+	&quot;city&quot;,
+	&quot;state&quot;,
+	&quot;postal_code&quot;,
+	&quot;orgname&quot;,
+	&quot;balances&quot;,
+	&quot;barcodeurl&quot;,
+	CONCAT(CAST(&quot;lvgca1&quot; as Varchar),CAST(&quot;lvgca2&quot; as Varchar)) as &quot;lvgcavatar&quot;
+	from :T1;
+	
+	
+
+   var_out = SELECT 
+	&quot;userid&quot;,
+	&quot;email&quot;,
+	&quot;firstname&quot;,
+	&quot;lastname&quot;,
+	&quot;displayname&quot;,
+    &quot;customerrating&quot; ,
+    &quot;cmmilevel&quot;,
+	&quot;employee_size&quot;,
+	&quot;aboutorg&quot;,
+	&quot;registration_time&quot;,
+	&quot;contact&quot;,
+	&quot;status&quot;,
+	&quot;last_updated_on&quot;,
+	&quot;street_no&quot;, 
+	&quot;street&quot;,
+	&quot;city&quot;,
+	&quot;state&quot;,
+	&quot;postal_code&quot;,
+	&quot;orgname&quot;,
+	&quot;balances&quot;,
+	&quot;barcodeurl&quot; ,
+	&quot;lvgcavatar&quot; ,
+	(&quot;cmmilevel&quot; + &quot;customerrating&quot;)*(10) as &quot;success_rate&quot;
+	from :T2;
+END /********* End Procedure Script ************/</definition>
+  </calculationView>
+</calculationViews>
+<logicalModel id="Script_View">
+  <attributes>
+    <attribute id="userid" key="true" order="1">
+      <descriptions defaultDescription="userid"/>
+      <keyMapping columnObjectName="Script_View" columnName="userid"/>
+    </attribute>
+    <attribute id="email" order="2">
+      <descriptions defaultDescription="email"/>
+      <keyMapping columnObjectName="Script_View" columnName="email"/>
+    </attribute>
+    <attribute id="firstname" order="3">
+      <descriptions defaultDescription="firstname"/>
+      <keyMapping columnObjectName="Script_View" columnName="firstname"/>
+    </attribute>
+    <attribute id="lastname" order="4">
+      <descriptions defaultDescription="lastname"/>
+      <keyMapping columnObjectName="Script_View" columnName="lastname"/>
+    </attribute>
+    <attribute id="displayname" order="5">
+      <descriptions defaultDescription="displayname"/>
+      <keyMapping columnObjectName="Script_View" columnName="displayname"/>
+    </attribute>
+    <attribute id="customerrating" order="6">
+      <descriptions defaultDescription="customerrating"/>
+      <keyMapping columnObjectName="Script_View" columnName="customerrating"/>
+    </attribute>
+    <attribute id="cmmilevel" order="7">
+      <descriptions defaultDescription="cmmilevel"/>
+      <keyMapping columnObjectName="Script_View" columnName="cmmilevel"/>
+    </attribute>
+    <attribute id="employee_size" order="8">
+      <descriptions defaultDescription="employee_size"/>
+      <keyMapping columnObjectName="Script_View" columnName="employee_size"/>
+    </attribute>
+    <attribute id="aboutorg" order="9">
+      <descriptions defaultDescription="aboutorg"/>
+      <keyMapping columnObjectName="Script_View" columnName="aboutorg"/>
+    </attribute>
+    <attribute id="registration_time" order="10">
+      <descriptions defaultDescription="registration_time"/>
+      <keyMapping columnObjectName="Script_View" columnName="registration_time"/>
+    </attribute>
+    <attribute id="contact" order="11">
+      <descriptions defaultDescription="contact"/>
+      <keyMapping columnObjectName="Script_View" columnName="contact"/>
+    </attribute>
+    <attribute id="status" order="12">
+      <descriptions defaultDescription="status"/>
+      <keyMapping columnObjectName="Script_View" columnName="status"/>
+    </attribute>
+    <attribute id="last_updated_on" order="13">
+      <descriptions defaultDescription="last_updated_on"/>
+      <keyMapping columnObjectName="Script_View" columnName="last_updated_on"/>
+    </attribute>
+    <attribute id="street_no" order="14">
+      <descriptions defaultDescription="street_no"/>
+      <keyMapping columnObjectName="Script_View" columnName="street_no"/>
+    </attribute>
+    <attribute id="street" order="15">
+      <descriptions defaultDescription="street"/>
+      <keyMapping columnObjectName="Script_View" columnName="street"/>
+    </attribute>
+    <attribute id="city" order="16">
+      <keyMapping columnObjectName="Script_View" columnName="city"/>
+    </attribute>
+    <attribute id="state" order="17">
+      <keyMapping columnObjectName="Script_View" columnName="state"/>
+    </attribute>
+    <attribute id="postal_code" order="18">
+      <keyMapping columnObjectName="Script_View" columnName="postal_code"/>
+    </attribute>
+    <attribute id="orgname" order="19">
+      <keyMapping columnObjectName="Script_View" columnName="orgname"/>
+    </attribute>
+    <attribute id="balances" order="20">
+      <keyMapping columnObjectName="Script_View" columnName="balances"/>
+    </attribute>
+    <attribute id="barcodeurl" order="21">
+      <keyMapping columnObjectName="Script_View" columnName="barcodeurl"/>
+    </attribute>
+  
+    <attribute id="lvgcavatar" order="22">
+  
+      <keyMapping columnObjectName="Script_View" columnName="lvgcavatar"/>
+  
+    </attribute>
+  
+    <attribute id="success_rate" order="23">
+  
+      <keyMapping columnObjectName="Script_View" columnName="success_rate"/>
+  
+    </attribute>
+  </attributes>
+  <calculatedAttributes/>
+  <baseMeasures/>
+  <calculatedMeasures/>
+  <restrictedMeasures/>
+</logicalModel>
+<layout>
+  <shapes>
+    <shape expanded="true" modelObjectName="Output" modelObjectNameSpace="MeasureGroup">
+      <upperLeftCorner x="40" y="85"/>
+    </shape>
+  </shapes>
+</layout>
+</Calculation:scenario>

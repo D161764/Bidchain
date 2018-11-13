@@ -1,0 +1,263 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Calculation:scenario xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:Calculation="http://www.sap.com/ndb/BiModelCalculation.ecore" id="ProjMaster" applyPrivilegeType="NONE" dataCategory="DIMENSION" dimensionType="STANDARD" schemaVersion="2.3" defaultClient="crossClient" visibility="internal" calculationScenarioType="SCRIPT_BASED" scriptParametersCaseSensitive="true" enforceSqlExecution="false">
+<descriptions defaultDescription="ProjMaster"/>
+<localVariables/>
+<variableMappings/>
+<dataSources/>
+<calculationViews>
+  <calculationView xsi:type="Calculation:SqlScriptView" id="Script_View">
+    <viewAttributes>
+      <viewAttribute id="projectid" datatype="NVARCHAR" length="20"/>
+    
+      <viewAttribute id="project_owner_id" datatype="NVARCHAR" length="20"/>
+      <viewAttribute id="project_details" datatype="NCLOB"/>
+      <viewAttribute id="project_name" datatype="NVARCHAR" length="20"/>
+      <viewAttribute id="project_executioner" datatype="NVARCHAR" length="20"/>
+      <viewAttribute id="project_status" datatype="NVARCHAR" length="10"/>
+      <viewAttribute id="approver_id" datatype="NVARCHAR" length="20"/>
+      <viewAttribute id="approver_email" datatype="NVARCHAR" length="60"/>
+      <viewAttribute id="created_on" datatype="TIMESTAMP"/>
+      <viewAttribute id="last_updated_on" datatype="TIMESTAMP"/>
+      <viewAttribute id="listing_status" datatype="NVARCHAR" length="15"/>
+      <viewAttribute id="project_owner_mail" datatype="NVARCHAR" length="60"/>
+      <viewAttribute id="userid" datatype="NVARCHAR" length="20"/>
+      <viewAttribute id="firstname" datatype="NVARCHAR" length="100"/>
+      <viewAttribute id="lastname" datatype="NVARCHAR" length="100"/>
+      <viewAttribute id="displayname" datatype="NVARCHAR" length="100"/>
+      <viewAttribute id="aboutorg" datatype="NCLOB"/>
+      <viewAttribute id="contact" datatype="NVARCHAR" length="20"/>
+      <viewAttribute id="street_no" datatype="NVARCHAR" length="20"/>
+      <viewAttribute id="street" datatype="NVARCHAR" length="500"/>
+      <viewAttribute id="city" datatype="NVARCHAR" length="50"/>
+      <viewAttribute id="state" datatype="NVARCHAR" length="20"/>
+      <viewAttribute id="postal_code" datatype="NVARCHAR" length="20"/>
+      <viewAttribute id="orgname" datatype="NVARCHAR" length="100"/>
+      <viewAttribute id="balances" datatype="INTEGER"/>
+    
+      <viewAttribute id="projectbarcode" datatype="NVARCHAR" length="500"/>
+    </viewAttributes>
+    <calculatedViewAttributes/>
+    <definition>/********* Begin Procedure Script ************/ 
+BEGIN 
+  declare lv_gcapi NVARCHAR(500);
+  lv_gcapi = 'https://chart.googleapis.com/chart?cht=qr&amp;chs=329x329&amp;chl=';
+   VAR_T1 = SELECT 
+	&quot;projectid&quot;,
+	&quot;project_owner_id&quot;,
+	&quot;project_details&quot;,
+	&quot;project_name&quot;,
+	&quot;project_executioner&quot;,
+	&quot;project_status&quot;,
+	&quot;approver_id&quot;,
+	&quot;approver_email&quot;,
+	&quot;created_on&quot;,
+	&quot;last_updated_on&quot;,
+	&quot;listing_status&quot;,
+	&quot;project_owner_mail&quot;
+	
+FROM &quot;BIDCHAIN&quot;.&quot;BIDDINGCHAIN.DBARTIFACT::TableAndStructure.Projects&quot;;
+
+  VAR_T2 = SELECT 
+	&quot;userid&quot;,
+	&quot;email&quot;,
+	&quot;firstname&quot;,
+	&quot;lastname&quot;,
+	&quot;displayname&quot;,
+	&quot;customerrating&quot;,
+	&quot;cmmilevel&quot;,
+	&quot;employee_size&quot;,
+	&quot;aboutorg&quot;,
+	&quot;registration_time&quot;,
+	&quot;contact&quot;,
+	&quot;status&quot;,
+	&quot;last_updated_on&quot;,
+	&quot;street_no&quot;,
+	&quot;street&quot;,
+	&quot;city&quot;,
+	&quot;state&quot;,
+	&quot;postal_code&quot;,
+	&quot;orgname&quot;,
+	&quot;balances&quot;
+FROM &quot;BIDCHAIN&quot;.&quot;BIDDINGCHAIN.DBARTIFACT::TableAndStructure.UserProfile&quot;;
+
+   T3 = SELECT 
+	T1.&quot;projectid&quot;,
+	T1.&quot;project_owner_id&quot;,
+	T1.&quot;project_details&quot;,
+	T1.&quot;project_name&quot;,
+	T1.&quot;project_executioner&quot;,
+	T1.&quot;project_status&quot;,
+	T1.&quot;approver_id&quot;,
+	T1.&quot;approver_email&quot;,
+	T1.&quot;created_on&quot;,
+	T1.&quot;last_updated_on&quot;,
+	T1.&quot;listing_status&quot;,
+	T1.&quot;project_owner_mail&quot;,
+	T2.&quot;userid&quot;,
+    T2.&quot;firstname&quot;,
+	T2.&quot;lastname&quot;,
+	T2.&quot;displayname&quot;,
+    T2.&quot;aboutorg&quot;,
+	T2.&quot;contact&quot;,
+	T2.&quot;status&quot;,
+	T2.&quot;street_no&quot;,
+	T2.&quot;street&quot;,
+	T2.&quot;city&quot;,
+	T2.&quot;state&quot;,
+	T2.&quot;postal_code&quot;,
+    T2.&quot;orgname&quot;,
+    T2.&quot;balances&quot; from :VAR_T1 as T1 inner join :VAR_T2 as T2 on T1.&quot;project_owner_id&quot; = T2.&quot;userid&quot;;
+    
+    var_out = SELECT 	&quot;projectid&quot;,
+	&quot;project_owner_id&quot;,
+	&quot;project_details&quot;,
+	&quot;project_name&quot;,
+    &quot;project_executioner&quot;,
+	&quot;project_status&quot;,
+	&quot;approver_id&quot;,
+    &quot;approver_email&quot;,
+	&quot;created_on&quot;,
+	&quot;last_updated_on&quot;,
+	&quot;listing_status&quot;,
+	&quot;project_owner_mail&quot;,
+    &quot;userid&quot;,
+    &quot;firstname&quot;,
+    &quot;lastname&quot;,
+    &quot;displayname&quot;,
+    &quot;aboutorg&quot;,
+    &quot;contact&quot;,
+    &quot;street_no&quot;,
+    &quot;street&quot;,
+    &quot;city&quot;,
+    &quot;state&quot;,
+    &quot;postal_code&quot;,
+    &quot;orgname&quot; ,
+    &quot;balances&quot;,
+    CONCAT(CAST(:lv_gcapi as Varchar),CAST(&quot;projectid&quot; as Varchar)) as &quot;projectbarcode&quot;from :T3;
+    
+END /********* End Procedure Script ************/</definition>
+  </calculationView>
+</calculationViews>
+<logicalModel id="Script_View">
+  <attributes>
+    <attribute id="projectid" order="1" key="true">
+      <descriptions defaultDescription="projectid"/>
+      <keyMapping columnObjectName="Script_View" columnName="projectid"/>
+    </attribute>
+  
+    <attribute id="project_owner_id" order="2">
+      <descriptions defaultDescription="project_owner_id"/>
+  
+      <keyMapping columnObjectName="Script_View" columnName="project_owner_id"/>
+  
+    </attribute>
+    <attribute id="project_details" order="3">
+      <descriptions defaultDescription="project_details"/>
+      <keyMapping columnObjectName="Script_View" columnName="project_details"/>
+    </attribute>
+    <attribute id="project_name" order="4">
+      <descriptions defaultDescription="project_name"/>
+      <keyMapping columnObjectName="Script_View" columnName="project_name"/>
+    </attribute>
+    <attribute id="project_executioner" order="5">
+      <descriptions defaultDescription="project_executioner"/>
+      <keyMapping columnObjectName="Script_View" columnName="project_executioner"/>
+    </attribute>
+    <attribute id="project_status" order="6">
+      <descriptions defaultDescription="project_status"/>
+      <keyMapping columnObjectName="Script_View" columnName="project_status"/>
+    </attribute>
+    <attribute id="approver_id" order="7">
+      <descriptions defaultDescription="approver_id"/>
+      <keyMapping columnObjectName="Script_View" columnName="approver_id"/>
+    </attribute>
+    <attribute id="approver_email" order="8">
+      <descriptions defaultDescription="approver_email"/>
+      <keyMapping columnObjectName="Script_View" columnName="approver_email"/>
+    </attribute>
+    <attribute id="created_on" order="9">
+      <descriptions defaultDescription="created_on"/>
+      <keyMapping columnObjectName="Script_View" columnName="created_on"/>
+    </attribute>
+    <attribute id="last_updated_on" order="10">
+      <descriptions defaultDescription="last_updated_on"/>
+      <keyMapping columnObjectName="Script_View" columnName="last_updated_on"/>
+    </attribute>
+    <attribute id="listing_status" order="11">
+      <descriptions defaultDescription="listing_status"/>
+      <keyMapping columnObjectName="Script_View" columnName="listing_status"/>
+    </attribute>
+    <attribute id="project_owner_mail" order="12">
+      <descriptions defaultDescription="project_owner_mail"/>
+      <keyMapping columnObjectName="Script_View" columnName="project_owner_mail"/>
+    </attribute>
+    <attribute id="userid" order="13">
+      <keyMapping columnObjectName="Script_View" columnName="userid"/>
+    </attribute>
+    <attribute id="firstname" order="14">
+      <descriptions defaultDescription="firstname"/>
+      <keyMapping columnObjectName="Script_View" columnName="firstname"/>
+    </attribute>
+    <attribute id="lastname" order="15">
+      <descriptions defaultDescription="lastname"/>
+      <keyMapping columnObjectName="Script_View" columnName="lastname"/>
+    </attribute>
+    <attribute id="displayname" order="16">
+      <descriptions defaultDescription="displayname"/>
+      <keyMapping columnObjectName="Script_View" columnName="displayname"/>
+    </attribute>
+    <attribute id="aboutorg" order="17">
+      <descriptions defaultDescription="aboutorg"/>
+      <keyMapping columnObjectName="Script_View" columnName="aboutorg"/>
+    </attribute>
+    <attribute id="contact" order="18">
+      <descriptions defaultDescription="contact"/>
+      <keyMapping columnObjectName="Script_View" columnName="contact"/>
+    </attribute>
+    <attribute id="street_no" order="19">
+      <descriptions defaultDescription="street_no"/>
+      <keyMapping columnObjectName="Script_View" columnName="street_no"/>
+    </attribute>
+    <attribute id="street" order="20">
+      <descriptions defaultDescription="street"/>
+      <keyMapping columnObjectName="Script_View" columnName="street"/>
+    </attribute>
+    <attribute id="city" order="21">
+      <descriptions defaultDescription="city"/>
+      <keyMapping columnObjectName="Script_View" columnName="city"/>
+    </attribute>
+    <attribute id="state" order="22">
+      <descriptions defaultDescription="state"/>
+      <keyMapping columnObjectName="Script_View" columnName="state"/>
+    </attribute>
+    <attribute id="postal_code" order="23">
+      <descriptions defaultDescription="postal_code"/>
+      <keyMapping columnObjectName="Script_View" columnName="postal_code"/>
+    </attribute>
+    <attribute id="orgname" order="24">
+      <descriptions defaultDescription="orgname"/>
+      <keyMapping columnObjectName="Script_View" columnName="orgname"/>
+    </attribute>
+    <attribute id="balances" order="25">
+      <keyMapping columnObjectName="Script_View" columnName="balances"/>
+    </attribute>
+  
+    <attribute id="projectbarcode" order="26">
+  
+      <keyMapping columnObjectName="Script_View" columnName="projectbarcode"/>
+  
+    </attribute>
+  </attributes>
+  <calculatedAttributes/>
+  <baseMeasures/>
+  <calculatedMeasures/>
+  <restrictedMeasures/>
+</logicalModel>
+<layout>
+  <shapes>
+    <shape expanded="true" modelObjectName="Output" modelObjectNameSpace="MeasureGroup">
+      <upperLeftCorner x="40" y="85"/>
+    </shape>
+  </shapes>
+</layout>
+</Calculation:scenario>
